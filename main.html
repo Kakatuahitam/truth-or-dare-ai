@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Truth or Dare</title>
+<style>
+  body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin:0; }
+  .grid { display: grid; grid-template-columns: repeat(4, 100px); gap:10px; }
+  .card { background:#fff; border:1px solid #ccc; border-radius:6px; width:100px; height:100px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .card.open { background:#e0e0e0; cursor:default; }
+  .card.disabled { background:#ddd; cursor:not-allowed; }
+</style>
+</head>
+<body>
+<div class="grid" id="grid"></div>
+<script>
+const prompts = [
+  "Truth: Favorite cartoon?",
+  "Dare: Sing a song.",
+  "Truth: What makes you happy?",
+  "Dare: 5 jumping jacks.",
+  "Truth: Favorite food?",
+  "Dare: Act like a monkey.",
+  "Truth: What scares you?",
+  "Dare: Spin 3 times.",
+  "Truth: Funniest moment?",
+  "Dare: Make a silly face.",
+  "Truth: Best friend?",
+  "Dare: Dance like robot.",
+  "Truth: Favorite animal?",
+  "Dare: Be a superhero.",
+  "Truth: Favorite game?",
+  "Dare: Clap 10 times."
+];
+const shuffled = prompts.sort(() => Math.random()-0.5);
+const grid = document.getElementById('grid');
+shuffled.forEach((text,i)=>{
+  const c=document.createElement('div');
+  c.className='card'; c.textContent='Card';
+  c.onclick=()=>{
+    if(c.classList.contains('open'))return;
+    c.textContent=text; c.classList.add('open');
+    setTimeout(()=>{c.textContent='Used';c.classList.add('disabled');},4000);
+  };
+  grid.appendChild(c);
+});
+</script>
+</body>
+</html>
