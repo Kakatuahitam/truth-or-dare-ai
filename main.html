@@ -116,15 +116,45 @@
       grid-template-columns:repeat(2,1fr);
     }
   }
+
+  @keyframes shatter {
+    0% { transform: rotate(0deg);}
+    20% { transform: rotate(5deg);}
+    40% { transform: rotate(-5deg);}
+    60% { transform: rotate(-5deg);}
+    80% { transform: rotate(5deg);}
+    100% { transform: rotate(0deg);}
+  }
+
+  .overlay-card.shatter {
+    animation: shatter 5s ease;
+  }
+
+  .hidden {
+    display:none;
+  }
+
 </style>
 </head>
 <body>
 
-<div class="grid" id="grid"></div>
+<div id="landing">
+  <h1>Pilih Pos</h1>
+  <button data-pos="ayah">Pos Ayah</button>
+  <button data-pos="ibu">Pos Ibu</button>
+  <button data-pos="saudara">Pos Kakak/Adik</button>
+  <button data-pos="hewan">Pos Hewan Peliharaan</button>
+</div>
+
+<div id="gridView" class="hidden">
+  <div class="grid" id="grid"></div>
+  <button class="reset" id="reset">Reset</button>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="overlay-card" id="overlayCard">
     <div class="front">
-      <div>[Logo Here]<br/>Click to Reveal</div>
+      <div><img src="charmed-lion.png"><br/>Click to Reveal</div>
     </div>
     <div class="back">
       <div class="truth"></div>
@@ -136,35 +166,148 @@
 <button class="reset" id="reset">Reset Game</button>
 
 <!-- Sound placeholders -->
-<audio id="sound-click" src="click.mp3"></audio>
-<audio id="sound-reveal" src="reveal.wav"></audio>
+<audio id="sound-click" src="click.wav"></audio>
+<audio id="sound-reveal" src="reveal.mp3"></audio>
 <audio id="sound-close" src="close.wav"></audio>
 
 <script>
-const prompts = [
-  {truth:"What is your favorite cartoon?", dare:"Sing your favorite song."},
-  {truth:"What makes you happy?", dare:"Do 5 jumping jacks."},
-  {truth:"What is your favorite food?", dare:"Act like a monkey for 10 sec."},
-  {truth:"What are you afraid of?", dare:"Spin around 3 times."},
-  {truth:"Who is your best friend?", dare:"Dance like a robot."},
-  {truth:"What is your favorite animal?", dare:"Pretend to be a superhero."},
-  {truth:"What is your favorite game?", dare:"Clap your hands 10 times."},
-  {truth:"What is something you love?", dare:"Hop on one foot."},
-  {truth:"Who do you admire?", dare:"Do a silly dance."},
-  {truth:"What is your favorite hobby?", dare:"Make a funny face."},
-  {truth:"Where do you want to travel?", dare:"Roar like a lion."},
-  {truth:"What is your dream job?", dare:"Walk like a crab."},
-  {truth:"What makes you laugh?", dare:"Pretend to fly."},
-  {truth:"What do you dislike?", dare:"Touch your toes."},
-  {truth:"What is your favorite color?", dare:"Act like a chicken."},
-  {truth:"What makes you proud?", dare:"Spin and clap."},
-  {truth:"What do you want to learn?", dare:"Snap fingers 10 times."},
-  {truth:"What is your happiest memory?", dare:"Balance on one leg."},
-  {truth:"What is your favorite movie?", dare:"Pretend to be a robot."},
-  {truth:"What do you want for your birthday?", dare:"Do a superhero pose."},
-];
-let availablePrompts = [...prompts];
+const truths = {
+  ayah: [
+    "Apa nasihat ayah yang paling kamu ingat?",
+    "Momen apa yang paling menyenangkan bersama ayah?",
+    "Kalau ayah marah, biasanya karena apa?",
+    "Apa makanan favorit ayah?",
+    "Bagaimana ayah menunjukkan rasa sayang padamu?",
+    "Ceritakan kebiasaan unik ayah di rumah.",
+    "Pernahkah kamu membuat ayah bangga? Kapan?",
+    "Apa hobi ayah yang kamu tahu?",
+    "Apa julukan atau panggilan sayang ayah kepadamu?",
+    "Apa warna favorit ayah?",
+    "Kalau ayah sedang santai, apa yang beliau lakukan?",
+    "Bagaimana cara ayah menyemangati kamu saat sedih?",
+    "Kalau ayah pulang kerja, apa yang pertama kali beliau lakukan?",
+    "Apa hadiah terbaik yang pernah ayah beri?",
+    "Apa yang paling kamu kagumi dari ayah?",
+    "Apa cita-cita ayah waktu kecil?",
+    "Apa yang membuat ayah tertawa?",
+    "Bagaimana ekspresi ayah kalau kamu dapat nilai bagus?",
+    "Pernahkah ayah membantumu mengerjakan PR?",
+    "Kalau ayah pergi lama, apa yang kamu rindukan?"
+  ],
+  ibu: [
+    "Apa masakan ibu yang paling enak menurutmu?",
+    "Bagaimana cara ibu mengantarmu tidur?",
+    "Kalau ibu marah, biasanya karena apa?",
+    "Apa kebiasaan ibu yang paling lucu?",
+    "Apa yang membuat ibu senang?",
+    "Bagaimana ibu menenangkanmu saat sedih?",
+    "Apa hadiah terbaik dari ibu?",
+    "Ceritakan saat ibu memujimu.",
+    "Apa warna kesukaan ibu?",
+    "Bagaimana ekspresi ibu saat kamu sakit?",
+    "Apa yang sering dikatakan ibu sebelum tidur?",
+    "Apa cita-cita ibu waktu kecil?",
+    "Pernahkah ibu membacakan cerita untukmu? Cerita apa?",
+    "Bagaimana cara ibu menunjukkan sayang?",
+    "Kalau ibu belanja, apa yang paling sering dibeli?",
+    "Apa hobi ibu?",
+    "Pernahkah ibu membantu mengerjakan PR?",
+    "Bagaimana ekspresi ibu saat kamu dapat nilai bagus?",
+    "Apa panggilan sayang ibu kepadamu?",
+    "Apa yang paling kamu kagumi dari ibu?"
+  ],
+  saudara: [
+    "Siapa saudara terdekatmu?",
+    "Apa permainan favorit kalian?",
+    "Pernahkah kalian bertengkar? Karena apa?",
+    "Apa kebiasaan lucu saudaramu?",
+    "Ceritakan momen seru bersama saudara.",
+    "Kalau saudaramu sedih, apa yang kamu lakukan?",
+    "Apa panggilan sayang saudaramu kepadamu?",
+    "Pernahkah kalian saling membantu? Kapan?",
+    "Apa makanan favorit saudaramu?",
+    "Siapa yang paling sering mengalah saat bermain?",
+    "Apa warna favorit saudaramu?",
+    "Kalau liburan, apa yang paling seru dilakukan bersama?",
+    "Siapa yang lebih rapi, kamu atau saudaramu?",
+    "Pernahkah kalian berbagi rahasia?",
+    "Apa yang membuatmu bangga pada saudaramu?",
+    "Apa cita-cita saudaramu?",
+    "Siapa yang paling sering bercanda?",
+    "Apa julukan lucu saudaramu?",
+    "Apa yang kamu pelajari dari saudaramu?",
+    "Pernahkah kalian berbohong bersama?"
+  ],
+  hewan: [
+    "Apa nama hewan peliharaanmu?",
+    "Apa kebiasaan lucu hewanmu?",
+    "Apa makanan kesukaannya?",
+    "Bagaimana cara kamu merawatnya?",
+    "Apa yang paling kamu sukai dari hewanmu?",
+    "Pernahkah hewanmu sakit? Apa yang kamu lakukan?",
+    "Kalau hewanmu bisa bicara, apa yang ingin kamu tanyakan?",
+    "Ceritakan saat hewanmu membuatmu tertawa.",
+    "Bagaimana ekspresinya saat senang?",
+    "Kalau kamu sedih, apakah hewanmu menghiburmu?",
+    "Apa warna bulunya?",
+    "Apa mainan favorit hewanmu?",
+    "Siapa yang paling sering memberi makan?",
+    "Apa suara hewanmu saat senang?",
+    "Bagaimana pertama kali kamu bertemu hewanmu?",
+    "Kalau liburan, siapa yang merawat hewanmu?",
+    "Apa hal unik tentang hewanmu?",
+    "Apa kebiasaan pagi hari hewanmu?",
+    "Bagaimana perasaanmu punya hewan peliharaan?",
+    "Pernahkah hewanmu nakal? Ceritakan!"
+  ]
+};
 
+const dares = [
+  "Bernyanyi lagu favoritmu.",
+  "Menari seperti robot.",
+  "Peragakan dirimu sedang demam tinggi",
+  "Melompat dengan satu kaki.",
+  "Berputar 3 kali.",
+  "Menirukan suara hewan.",
+  "Melompat sambil tepuk tangan.",
+  "Membuat wajah lucu.",
+  "Tanya pada teman sebelahmu, 'mampir ke rumah aku yuk'",
+  "Melompat setinggi mungkin.",
+  "Jadi lilin yang menyala, 10 detik",
+  "Berjalan seperti pahlawan super.",
+  "Menirukan suara ayam berkokok.",
+  "Eja nama lengkap 2x",
+  "Berteriak 'Aku hebat!' 3 kali.",
+  "Menyebutkan nama semua anggota keluarga.",
+  "Melompat sambil berkata 'hore!'",
+  "Menirukan gerakan teman sebelah kiri/kanan/depan/belakang",
+  "Menari tanpa musik selama 15 detik.",
+  "Menirukan suara kucing mengeong.",
+  "Menepuk kaki sambil menyanyi.",
+  "123 jadi patung 10 detik",
+  "Menggoyangkan badan seakan kedinginan.",
+  "Menirukan gaya orang tidur.",
+  "Mengucapkan huruf vokal dengan suara robot.",
+  "Menirukan suara motor.",
+  "Tepuk batagor dengan sangat cepat 2x",
+  "Menyebutkan 5 warna secepat mungkin.",
+  "Menepuk dada seperti gorila.",
+  "Menirukan suara kambing mengembik.",
+  "Melompat mundur 5 langkah.",
+  "Menirukan gaya orang menguap.",
+  "Menyebutkan 3 makanan favoritmu.",
+  "Berlari di tempat selama 10 detik.",
+  "Menirukan suara sapi.",
+  "Tepuk pramuka 3x",
+  "Melambaikan tangan sambil tersenyum lebar.",
+  "Menirukan suara hujan turun.",
+  "Membungkuk seperti orang tua.",
+  "Menirukan gaya penyanyi rock."
+];
+
+
+const landing = document.getElementById('landing');
+const gridView = document.getElementById('gridView');
 const grid = document.getElementById('grid');
 const overlay = document.getElementById('overlay');
 const overlayCard = document.getElementById('overlayCard');
@@ -176,20 +319,42 @@ const sndClose = document.getElementById('sound-close');
 let usedCards = new Set();
 let currentCard = null;
 let flipped = false;
+let availablePrompts = [];
 
-function createGrid() {
-  grid.innerHTML='';
+document.querySelectorAll('[data-pos]').forEach(button => {
+  button.onclick = () => {
+    const pos = button.dataset.pos;
+    startGame(pos);
+  };
+});
+
+function startGame(pos) {
+  landing.classList.add('hidden');
+  gridView.classList.remove('hidden');
+  createGrid(getPrompts(pos));
+}
+
+function getPrompts(pos) {
+  const shuffled = truths[pos].slice().sort(() => Math.random() - 0.5);
+  return shuffled.map(t => ({
+    truth: t,
+    dare: dares[Math.floor(Math.random() * dares.length)]
+  }));
+}
+
+function createGrid(prompts) {
+  grid.innerHTML = '';
   usedCards.clear();
-  availablePrompts = prompts.slice().sort(()=>Math.random()-0.5);
-  for(let i=0;i<20;i++){
-    const card=document.createElement('div');
-    card.className='card';
-    card.dataset.index=i;
-    card.textContent='Card';
-    card.onclick=()=>{
-      if(card.classList.contains('disabled'))return;
-      currentCard=card;
-      flipped=false;
+  availablePrompts = prompts.slice();
+  for (let i = 0; i < 20; i++) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.index = i;
+    card.innerHTML = '<img src="charmed-lion.png" alt="Logo" style="max-width:60%;height:auto;">';
+    card.onclick = () => {
+      if (card.classList.contains('disabled')) return;
+      currentCard = card;
+      flipped = false;
       showOverlay();
       sndClick.play();
     };
@@ -197,38 +362,54 @@ function createGrid() {
   }
 }
 
+
 function showOverlay(){
   overlay.classList.add('show');
   overlayCard.classList.remove('flipped');
 }
 
-overlayCard.onclick=()=>{
-  if(!flipped){
-    const promptData=availablePrompts.pop();
-    if(!promptData)return;
-    overlayCard.querySelector('.truth').textContent="Truth: "+promptData.truth;
-    overlayCard.querySelector('.dare').textContent="Dare: "+promptData.dare;
-    overlayCard.classList.add('flipped');
+overlayCard.onclick = () => {
+  if (!flipped) {
+    const promptData = availablePrompts.pop();
+    if (!promptData) return;
+
+    // Add shatter class and play sound
+    overlayCard.classList.add('shatter');
     sndReveal.play();
-    flipped=true;
+
+    sndReveal.onended = () => {
+      // Remove shatter class (so it's reusable)
+      overlayCard.classList.remove('shatter');
+
+      // Show the TOD content and flip
+      overlayCard.querySelector('.truth').textContent = "Truth: " + promptData.truth;
+      overlayCard.querySelector('.dare').textContent = "Dare: " + promptData.dare;
+      overlayCard.classList.add('flipped');
+      flipped = true;
+    };
   } else {
+    sndClose.play();
     overlay.classList.remove('show');
     currentCard.classList.add('disabled');
     usedCards.add(currentCard.dataset.index);
-    currentCard=null;
-    if(usedCards.size===20){
-      resetBtn.style.display='block';
+    currentCard = null;
+    if (usedCards.size === 20) {
+      resetBtn.style.display = 'block';
     }
   }
 };
 
-resetBtn.onclick=()=>{
+
+
+
+resetBtn.onclick = () => {
   sndClose.play();
-  createGrid();
-  resetBtn.style.display='none';
+  gridView.classList.add('hidden');
+  landing.classList.remove('hidden');
+  resetBtn.style.display = 'none';
 };
 
-createGrid();
+// createGrid();
 </script>
 
 </body>
