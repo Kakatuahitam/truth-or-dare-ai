@@ -1,140 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Truth or Dare</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  body {
-    margin:0;
-    font-family:'Plus Jakarta Sans', sans-serif;
-    background:#f0f0f0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height:100vh;
-  }
-  .grid {
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:10px;
-    width:90%;
-    max-width:900px;
-    margin:20px auto;
-  }
-  .card {
-    background:#fff;
-    border:1px solid #ccc;
-    border-radius:8px;
-    aspect-ratio:1/1.3;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
-    cursor:pointer;
-    position:relative;
-  }
-  .card.disabled {
-    background:#ddd;
-    cursor:not-allowed;
-  }
-  .overlay {
-    position:fixed;
-    top:0;left:0;right:0;bottom:0;
-    background:rgba(0,0,0,0.6);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:999;
-    visibility:hidden;
-    opacity:0;
-    transition:opacity 0.3s;
-  }
-  .overlay.show {
-    visibility:visible;
-    opacity:1;
-  }
-  .overlay-card {
-    background:#fff;
-    border-radius:10px;
-    width:80%;
-    max-width:400px;
-    aspect-ratio:1/1.3;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    cursor:pointer;
-    padding:20px;
-    text-align:center;
-    position:relative;
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
-  }
-  .overlay-card.flipped {
-    transform: rotateY(180deg);
-  }
-  .overlay-card .front,
-  .overlay-card .back {
-    position:absolute;
-    width:100%;
-    height:100%;
-    backface-visibility:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    padding:10px;
-  }
-  .overlay-card .back {
-    transform: rotateY(180deg);
-  }
-  .front div {
-    font-size:0.9em;
-  }
-  .back .truth, .back .dare {
-    font-weight:bold;
-  }
-  .back .or {
-    margin:5px 0;
-    font-weight:normal;
-  }
-  .reset {
-    display:none;
-    margin:20px;
-    padding:10px 20px;
-    font-size:1rem;
-    background:#007bff;
-    color:#fff;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-  }
-  @media(max-width:600px){
-    .grid{
-      grid-template-columns:repeat(2,1fr);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kartu ToD Keluarga</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="charmed-lion-mini.png" type="image/png" />
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Kartu ToD Keluarga" />
+  <meta name="description" content="Permainan Truth or Dare. Dedicated for 28 June 2025" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://kakatuahitam.github.io/truth-or-dare-ai/" />
+  <meta property="og:title" content="Kartu ToD Keluarga" />
+  <meta property="og:description" content="Permainan Truth or Dare. Dedicated for 28 June 2025" />
+  <meta property="og:image" content="https://kakatuahitam.github.io/truth-or-dare-ai/charmed-lion.png" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://kakatuahitam.github.io/truth-or-dare-ai/" />
+  <meta property="twitter:title" content="Kartu ToD Keluarga" />
+  <meta property="twitter:description" content="Permainan Truth or Dare. Dedicated for 28 June 2025" />
+  <meta property="twitter:image" content="https://kakatuahitam.github.io/truth-or-dare-ai/charmed-lion.png" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin:0;
+      font-family:'Plus Jakarta Sans', sans-serif;
+      background:#f0f0f0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-height:100vh;
     }
-  }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:10px;
+      width:90%;
+      max-width:900px;
+      margin:20px auto;
+    }
+    .card {
+      background:#fff;
+      border:1px solid #ccc;
+      border-radius:8px;
+      aspect-ratio:1/1.3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      cursor:pointer;
+      position:relative;
+    }
+    .card.disabled {
+      background:#ddd;
+      cursor:not-allowed;
+    }
+    .overlay {
+      position:fixed;
+      top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:999;
+      visibility:hidden;
+      opacity:0;
+      transition:opacity 0.3s;
+    }
+    .overlay.show {
+      visibility:visible;
+      opacity:1;
+    }
+    .overlay-card {
+      background:#fff;
+      border-radius:10px;
+      width:80%;
+      max-width:400px;
+      aspect-ratio:1/1.3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      cursor:pointer;
+      padding:20px;
+      text-align:center;
+      position:relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+    .overlay-card.flipped {
+      transform: rotateY(180deg);
+    }
+    .overlay-card .front,
+    .overlay-card .back {
+      position:absolute;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      padding:10px;
+    }
+    .overlay-card .back {
+      transform: rotateY(180deg);
+    }
+    .front div {
+      font-size:0.9em;
+    }
+    .back .truth, .back .dare {
+      font-weight:bold;
+    }
+    .back .or {
+      margin:5px 0;
+      font-weight:normal;
+    }
+    .reset {
+      display:none;
+      margin:20px;
+      padding:10px 20px;
+      font-size:1rem;
+      background:#007bff;
+      color:#fff;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+    }
+    @media(max-width:600px){
+      .grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
 
-  @keyframes shatter {
-    0% { transform: rotate(0deg);}
-    20% { transform: rotate(5deg);}
-    40% { transform: rotate(-5deg);}
-    60% { transform: rotate(-5deg);}
-    80% { transform: rotate(5deg);}
-    100% { transform: rotate(0deg);}
-  }
+    @keyframes shatter {
+      0% { transform: rotate(0deg);}
+      20% { transform: rotate(5deg);}
+      40% { transform: rotate(-5deg);}
+      60% { transform: rotate(-5deg);}
+      80% { transform: rotate(5deg);}
+      100% { transform: rotate(0deg);}
+    }
 
-  .overlay-card.shatter {
-    animation: shatter 5s ease;
-  }
+    .overlay-card.shatter {
+      animation: shatter 5s ease;
+    }
 
-  .hidden {
-    display:none;
-  }
+    .hidden {
+      display:none;
+    }
 
-</style>
+  </style>
 </head>
 <body>
 
